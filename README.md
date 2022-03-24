@@ -58,9 +58,9 @@ It is written in Python and uses Qt for its graphical interface.
 Below shows how to build the standalone executable on macOS, Linux and Windows.  
 
 ```bash
-# Setup conda
-conda create --name labelme python=3.9
-conda activate labelme
+# Setup virtualenv
+virtualenv --python=python3 venv
+source venv/bin/activate
 
 # Build the standalone executable
 pip install .
