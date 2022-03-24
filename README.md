@@ -7,13 +7,6 @@
 </h4>
 
 <div align="center">
-  <a href="https://pypi.python.org/pypi/labelme"><img src="https://img.shields.io/pypi/v/labelme.svg"></a>
-  <a href="https://pypi.org/project/labelme"><img src="https://img.shields.io/pypi/pyversions/labelme.svg"></a>
-  <a href="https://github.com/wkentaro/labelme/actions"><img src="https://github.com/wkentaro/labelme/workflows/ci/badge.svg?branch=main&event=push"></a>
-  <a href="https://hub.docker.com/r/wkentaro/labelme"><img src="https://img.shields.io/docker/cloud/build/wkentaro/labelme"></a>
-</div>
-
-<div align="center">
   <a href="#installation"><b>Installation</b></a> |
   <a href="#usage"><b>Usage</b></a> |
   <a href="https://github.com/wkentaro/labelme/tree/main/examples/tutorial#tutorial-single-image-example"><b>Tutorial</b></a> |
@@ -62,81 +55,19 @@ It is written in Python and uses Qt for its graphical interface.
 
 ## Installation
 
-There are options:
-
-- Platform agnostic installation: [Anaconda](#anaconda), [Docker](#docker)
-- Platform specific installation: [Ubuntu](#ubuntu), [macOS](#macos), [Windows](#windows)
-- Pre-build binaries from [the release section](https://github.com/wkentaro/labelme/releases)
-
-### Anaconda
-
-You need install [Anaconda](https://www.continuum.io/downloads), then run below:
+Below shows how to build the standalone executable on macOS, Linux and Windows.  
 
 ```bash
-# python3
-conda create --name=labelme python=3
-source activate labelme
-# conda install -c conda-forge pyside2
-# conda install pyqt
-# pip install pyqt5  # pyqt5 can be installed via pip on python3
-pip install labelme
-# or you can install everything by conda command
-# conda install labelme -c conda-forge
-```
-
-### Docker
-
-You need install [docker](https://www.docker.com), then run below:
-
-```bash
-# on macOS
-socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" &
-docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=docker.for.mac.host.internal:0 -v $(pwd):/root/workdir wkentaro/labelme
-
-# on Linux
-xhost +
-docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 -v $(pwd):/root/workdir wkentaro/labelme
-```
-
-### Ubuntu
-
-```bash
-sudo apt-get install labelme
-
-# or
-sudo pip3 install labelme
-
-# or install standalone executable from:
-# https://github.com/wkentaro/labelme/releases
-```
-
-### macOS
-
-```bash
-brew install pyqt  # maybe pyqt5
-pip install labelme
-
-# or
-brew install wkentaro/labelme/labelme  # command line interface
-# brew install --cask wkentaro/labelme/labelme  # app
-
-# or install standalone executable/app from:
-# https://github.com/wkentaro/labelme/releases
-```
-
-### Windows
-
-Install [Anaconda](https://www.continuum.io/downloads), then in an Anaconda Prompt run:
-
-```bash
-conda create --name=labelme python=3
+# Setup conda
+conda create --name labelme python=3.9
 conda activate labelme
-pip install labelme
 
-# or install standalone executable/app from:
-# https://github.com/wkentaro/labelme/releases
+# Build the standalone executable
+pip install .
+pip install pyinstaller
+pyinstaller labelme.spec
+dist/labelme --version
 ```
-
 
 ## Usage
 
@@ -194,38 +125,6 @@ source .anaconda3/bin/activate
 pip install -e .
 ```
 
-
-## How to build standalone executable
-
-Below shows how to build the standalone executable on macOS, Linux and Windows.  
-
-```bash
-# Setup conda
-conda create --name labelme python=3.9
-conda activate labelme
-
-# Build the standalone executable
-pip install .
-pip install pyinstaller
-pyinstaller labelme.spec
-dist/labelme --version
-```
-
-
-## How to contribute
-
-Make sure below test passes on your environment.  
-See `.github/workflows/ci.yml` for more detail.
-
-```bash
-pip install -r requirements-dev.txt
-
-flake8 .
-black --line-length 79 --check labelme/
-MPLBACKEND='agg' pytest -vsx tests/
-```
-
-
 ## Acknowledgement
 
-This repo is the fork of [mpitid/pylabelme](https://github.com/mpitid/pylabelme).
+This repo is the fork of [wkentaro/labelme](https://github.com/wkentaro/labelme).
