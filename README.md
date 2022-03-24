@@ -59,7 +59,7 @@ Below shows how to build the standalone executable on macOS, Linux and Windows.
 
 ```bash
 # Setup virtualenv
-virtualenv --python=python3 venv
+virtualenv --python=python3.8 venv
 source venv/bin/activate
 
 # Build the standalone executable
