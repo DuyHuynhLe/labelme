@@ -141,7 +141,7 @@ class LabelFile(object):
 
         # Only replace data after everything is loaded.
         self.flags = flags
-        self.shapes = shapes
+        self.shapes = sorted(shapes, key=lambda x: x["label"])
         self.imagePath = imagePath
         self.imageData = imageData
         self.filename = filename
