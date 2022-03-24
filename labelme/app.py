@@ -13,6 +13,7 @@ from qtpy import QtCore
 from qtpy.QtCore import Qt
 from qtpy import QtGui
 from qtpy import QtWidgets
+import qdarkstyle
 
 from labelme import __appname__
 from labelme import PY2
@@ -567,6 +568,15 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         fill_drawing.trigger()
 
+        # new option
+        darkMode = action(
+            self.tr('&Dark Theme'),
+            self.darkModeToggle,
+            icon=None,
+            tip=self.tr('Toggle dark theme'),
+            checkable=True,
+            checked=False
+        )
         # Lavel list context menu.
         labelMenu = QtWidgets.QMenu()
         utils.addActions(labelMenu, (edit, delete))
@@ -657,6 +667,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 brightnessContrast,
             ),
             onShapesPresent=(saveAs, hideAll, showAll),
+            darkMode=darkMode,
         )
 
         self.canvas.vertexSelected.connect(self.actions.removePoint.setEnabled)
@@ -712,6 +723,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 fitWidth,
                 None,
                 brightnessContrast,
+                None,
+                darkMode,
             ),
         )
 
@@ -938,6 +951,15 @@ class MainWindow(QtWidgets.QMainWindow):
         url = "https://github.com/wkentaro/labelme/tree/main/examples/tutorial"  # NOQA
         webbrowser.open(url)
 
+    def darkModeToggle(self):
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            raise RuntimeError("No Qt Application found.")
+        if self.actions.darkMode.isChecked():
+            app.setStyleSheet(qdarkstyle.load_stylesheet())
+        elif not self.actions.darkMode.isChecked():
+            app.setStyleSheet("")
+
     def toggleDrawingSensitive(self, drawing=True):
         """Toggle drawing sensitive.
 
@@ -1043,7 +1065,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def editLabel(self, item=None):
         if item and not isinstance(item, LabelListWidgetItem):
             raise TypeError("item must be LabelListWidgetItem type")
-
         if not self.canvas.editing():
             return
         if not item:
@@ -1068,24 +1089,28 @@ class MainWindow(QtWidgets.QMainWindow):
                 ),
             )
             return
-        shape.label = text
-        shape.flags = flags
-        shape.group_id = group_id
 
-        self._update_shape_color(shape)
-        if shape.group_id is None:
-            item.setText(
-                '{} <font color="#{:02x}{:02x}{:02x}">●</font>'.format(
-                    shape.label, *shape.fill_color.getRgb()[:3]
+        all_shapes = self.canvas.selectedShapes
+        self.labelList.clearSelection()
+        for shape in all_shapes:
+            shape.label = text
+            shape.flags = flags
+            shape.group_id = group_id
+
+            self._update_shape_color(shape)
+            if shape.group_id is None:
+                item.setText(
+                    '{} <font color="#{:02x}{:02x}{:02x}">●</font>'.format(
+                        shape.label, *shape.fill_color.getRgb()[:3]
+                    )
                 )
-            )
-        else:
-            item.setText("{} ({})".format(shape.label, shape.group_id))
-        self.setDirty()
-        if not self.uniqLabelList.findItemsByLabel(shape.label):
-            item = QtWidgets.QListWidgetItem()
-            item.setData(Qt.UserRole, shape.label)
-            self.uniqLabelList.addItem(item)
+            else:
+                item.setText("{} ({})".format(shape.label, shape.group_id))
+            self.setDirty()
+            if not self.uniqLabelList.findItemsByLabel(shape.label):
+                item = QtWidgets.QListWidgetItem()
+                item.setData(Qt.UserRole, shape.label)
+                self.uniqLabelList.addItem(item)
 
     def fileSearchChanged(self):
         self.importDirImages(
@@ -1126,7 +1151,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actions.delete.setEnabled(n_selected)
         self.actions.duplicate.setEnabled(n_selected)
         self.actions.copy.setEnabled(n_selected)
-        self.actions.edit.setEnabled(n_selected == 1)
+        self.actions.edit.setEnabled(n_selected)
 
     def addLabel(self, shape):
         if shape.group_id is None:
